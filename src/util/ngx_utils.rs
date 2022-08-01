@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
+use std::fs::File;
 use std::io;
-use std::io::SeekFrom;
+use std::io::{Read, Seek, SeekFrom};
 use std::process::{Command, Output};
-use tokio::fs::File;
 
 pub enum NgxCmd {
     // bin, conf
@@ -74,9 +74,9 @@ impl NgxCmd {
 
 #[derive(Deserialize, Serialize)]
 pub struct ShellOutput {
-    exit_code: i32,
-    stdout: String,
-    stderr: String,
+    pub exit_code: i32,
+    pub stdout: String,
+    pub stderr: String,
 }
 
 // linux: newLine -> \n
