@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
+use serde::de::Unexpected::Option;
 use std::fs::File;
 use std::io;
 use std::io::{Read, Seek, SeekFrom};
-use std::process::{Command, Output};
+use std::process::{Command, exit, Output};
 
 pub enum NgxCmd {
     // bin, conf
@@ -60,7 +61,6 @@ impl NgxCmd {
         let output = Command::new("sh")
             .arg("-c")
             .arg(self.cmd())
-            // .arg("echo '1234'")
             .output()
             .unwrap();
 

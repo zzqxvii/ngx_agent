@@ -1,12 +1,13 @@
-use crate::model::r::R;
-use crate::service;
-use crate::util::ngx_utils::NgxCmd;
+use axum::{Form, Json, Router};
 use axum::extract::{Query, RawQuery};
 use axum::http::{Request, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
-use axum::{Form, Json, Router};
 use serde::{Deserialize, Serialize};
+
+use crate::model::r::R;
+use crate::service;
+use crate::util::ngx_utils::NgxCmd;
 
 pub fn command_routers() -> Router {
     Router::new()

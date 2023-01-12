@@ -3,10 +3,11 @@ mod model;
 mod service;
 mod util;
 
-use axum::routing::get;
-use axum::Router;
 use std::net::SocketAddr;
 use std::process::Command;
+
+use axum::routing::get;
+use axum::Router;
 
 #[tokio::main]
 async fn main() {

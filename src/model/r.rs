@@ -1,7 +1,7 @@
 use axum::extract::rejection::JsonRejection::JsonDataError;
 use axum::http::StatusCode;
-use axum::response::IntoResponse;
 use axum::Json;
+use axum::response::IntoResponse;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
@@ -30,9 +30,9 @@ where
     }
 }
 
-impl R<String>
+impl R<()>
 where
-    (StatusCode, Json<R<String>>): IntoResponse,
+    (StatusCode, Json<R<()>>): IntoResponse,
 {
     pub fn ok() -> impl IntoResponse {
         (
@@ -40,7 +40,7 @@ where
             Json(R {
                 code: OK,
                 msg: String::from("success"),
-                data: "",
+                data: (),
             }),
         )
     }
@@ -51,7 +51,7 @@ where
             Json(R {
                 code: FAIL,
                 msg: String::from("error"),
-                data: "",
+                data: (),
             }),
         )
     }
@@ -62,7 +62,7 @@ where
             Json(R {
                 code: FAIL,
                 msg,
-                data: "",
+                data: (),
             }),
         )
     }
