@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
-use serde::de::Unexpected::Option;
 use std::fs::File;
-use std::io;
 use std::io::{Read, Seek, SeekFrom};
-use std::process::{Command, exit, Output};
+use std::process::Command;
+
+use serde::{Deserialize, Serialize};
 
 pub enum NgxCmd {
     // bin, conf
@@ -80,31 +79,29 @@ pub struct ShellOutput {
 }
 
 // linux: newLine -> \n
-pub fn read_reverse(path: &str, mut line: i32) -> io::Result<Vec<String>> {
-    let mut list = Vec::new();
+fn read_lines_reverse(mut file: File, mut lines: u32) -> std::io::Result<Vec<String>> {
     let nl = b'\n';
-    let mut file = File::open(path)?;
-    let mut pos = file.metadata()?.len() - 1;
-    let mut last_line = pos;
-    let mut buf_byt = [0; 1024 * 10];
-    let mut byt = [0; 1];
-    while pos > 0 && line > 0 {
-        file.seek(SeekFrom::Start(pos))?;
-        let _ = file.read(&mut byt)?;
-        if byt[0] == nl {
-            let line_len = last_line - pos - 1;
-            if line_len > 0 {
-                let tmp = &mut buf_byt[0..line_len as usize];
-                file.seek(SeekFrom::Start(pos + 1))?;
-                let _ = file.read(tmp);
-                list.push(String::from_utf8_lossy(tmp).to_string());
-            } else {
-                list.push(String::new());
-            }
-            last_line = pos;
-            line -= 1;
-        }
+    let metadata = file.metadata()?;
+    let mut pos = metadata.len();
+    let mut byte_buf: [u8; 1] = [0];
+    let mut line_bytes = Vec::new();
+    let mut str_lines = Vec::new();
+    while pos > 0 && lines > 0 {
         pos -= 1;
+        file.seek(SeekFrom::Start(pos))?;
+        file.read(&mut byte_buf)?;
+        if byte_buf[0] != nl {
+            line_bytes.push(byte_buf[0]);
+        } else {
+            line_bytes.reverse();
+            str_lines.push(String::from_utf8_lossy(&line_bytes).to_string());
+            line_bytes.clear();
+            lines -= 1;
+        }
     }
-    Ok(list)
+    if !str_lines.is_empty() {
+        line_bytes.reverse();
+        str_lines.push(String::from_utf8_lossy(&line_bytes).to_string());
+    }
+    Ok(str_lines)
 }
